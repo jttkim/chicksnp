@@ -34,9 +34,39 @@ public class Main
   private static SnpSession snpSession;
 
 
+  private static ChickenSnp vcfLineToChickenSnp(ChickenLine chickenLine, String vcfLine)
+  {
+    String[] w = vcfLine.split("\t");
+    if (w.length < 8)
+    {
+      throw new IllegalArgumentException(String.format("malformed VCF line: %s", vcfLine));
+    }
+    String chrom = w[0];
+    int pos = Integer.parseInt(w[1].trim());
+    String id = w[2];
+    String ref = w[3];
+    String alt = w[4];
+    String qual = w[5];
+    String filter = w[6];
+    String info = w[7];
+    ChickenSnp chickenSnp = new ChickenSnp(chickenLine, new ChickenChromosome(chrom), pos, ref, alt);
+    return (chickenSnp);
+  }
+
+
   private static void vcfImport(String chickenLineName, String filename) throws Exception
   {
-    snpSession.importVcf(chickenLineName, filename);
+    // snpSession.importVcf(chickenLineName, filename);
+    ChickenLine chickenLine = new ChickenLine(chickenLineName);
+    BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
+    for (String line = r.readLine(); line != null; line = r.readLine())
+    {
+      if ((line.length() > 0) && !line.startsWith("#"))
+      {
+        ChickenSnp chickenSnp = vcfLineToChickenSnp(chickenLine, line);
+        snpSession.insertChickenSnp(chickenSnp);
+      }
+    }
   }
 
 

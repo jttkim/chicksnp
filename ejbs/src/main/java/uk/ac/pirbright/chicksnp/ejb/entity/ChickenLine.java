@@ -1,5 +1,7 @@
 package uk.ac.pirbright.chicksnp.ejb.entity;
 
+import java.io.Serializable;
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -15,8 +17,10 @@ import javax.persistence.Column;
 
 
 @Entity
-public class ChickenLine
+public class ChickenLine implements Serializable
 {
+  private static final long serialVersionUID = 1;
+
   private Integer id;
   private String name;
   private Set<ChickenSnp> chickenSnpSet;

@@ -224,12 +224,14 @@ public class SnpSessionBean implements SnpSession
   {
     Set<ChickenLine> chickenLineSet1 = this.findChickenLineSet(chickenLineNameSet1);
     Set<ChickenLine> chickenLineSet2 = this.findChickenLineSet(chickenLineNameSet2);
-    Set<String> chickenLineNameSet = new HashSet<String>(chickenLineNameSet1);
-    chickenLineNameSet.addAll(chickenLineNameSet2);
-    System.err.println(String.format("findDifferentialSnpList: total number of line names is %d", chickenLineNameSet.size()));
+    Set<ChickenLine> allChickenLineSet = new HashSet<ChickenLine>(chickenLineSet1);
+    allChickenLineSet.addAll(chickenLineSet2);
+    Set<String> allChickenLineNameSet = new HashSet<String>(chickenLineNameSet1);
+    allChickenLineNameSet.addAll(chickenLineNameSet2);
+    System.err.println(String.format("findDifferentialSnpList: total number of line names is %d", allChickenLineNameSet.size()));
     Query query = this.entityManager.createQuery("SELECT s FROM ChickenSnp s WHERE s.chickenLine.name IN ( :nameSet ) ORDER BY s.chickenChromosome.name, s.pos");
-    query.setParameter("nameSet", chickenLineNameSet);
-    // query.setParameter("nameSet", chickenLineNameSet.iterator().next());
+    query.setParameter("nameSet", allChickenLineNameSet);
+    // query.setParameter("nameSet", allChickenLineNameSet.iterator().next());
     List<ChickenSnp> chickenSnpList = genericTypecast(query.getResultList());
     System.err.println(String.format("findDifferentialSnpList: got %d SNPs", chickenSnpList.size()));
     for (ChickenSnp chickenSnp : chickenSnpList)
@@ -249,6 +251,7 @@ public class SnpSessionBean implements SnpSession
         chickenLocus.addChickenSnp(chickenSnpList.get(j++));
       }
       i = j;
+      chickenLocus.addNonSnpLines(allChickenLineSet);
       Set<String> nucleotideSet1 = this.findNucleotideSet(chickenLocus, chickenLineSet1);
       Set<String> nucleotideSet2 = this.findNucleotideSet(chickenLocus, chickenLineSet2);
       nucleotideSet1.retainAll(nucleotideSet2);

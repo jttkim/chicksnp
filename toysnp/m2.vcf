@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+##contig=<ID=1,length=9>
+##INFO<ID=comment,Number=1,Type=String,Description="comment about this snp">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	2	.	C	A	40	PASS	comment=snp1
+1	4	.	T	C	40	PASS	comment=snp2
+1	6	.	C	G	40	PASS	comment=snp3
+1	8	.	T	C	40	PASS	comment=snp4

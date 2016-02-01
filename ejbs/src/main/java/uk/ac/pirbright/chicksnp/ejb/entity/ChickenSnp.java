@@ -1,5 +1,7 @@
 package uk.ac.pirbright.chicksnp.ejb.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
@@ -15,8 +17,10 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chickenLine_id", "chickenchromosome_id", "pos",  "alt"}))
-public class ChickenSnp
+public class ChickenSnp implements Serializable
 {
+  private static final long serialVersionUID = 1;
+
   private Integer id;
   private int pos;
   private String ref;
@@ -189,5 +193,13 @@ public class ChickenSnp
   public boolean atSameLocus(ChickenSnp other)
   {
     return (this.chickenChromosome.equals(other.chickenChromosome) && (this.pos == other.pos));
+  }
+
+
+  @Override
+  public String toString()
+  {
+    String s = String.format("%s:%d, %s: %s -> %s", this.chickenChromosome.getName(), this.pos, this.chickenLine.getName(), this.ref, this.alt);
+    return (s);
   }
 }
