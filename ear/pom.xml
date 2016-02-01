@@ -1,0 +1,68 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <properties>
+    <projectroot>${basedir}/..</projectroot>
+  </properties>
+
+  <parent>
+    <groupId>chicksnp-proj</groupId>
+    <artifactId>chicksnp</artifactId>
+    <version>${chicksnpVersion}</version>
+  </parent>
+
+  <artifactId>ear</artifactId>
+  <packaging>ear</packaging>
+  <name>chicksnp-ear</name>
+
+  <dependencies>
+    <!-- dependency>
+      <groupId>chicksnp-proj</groupId>
+      <artifactId>${chicksnp.webmodule}</artifactId>
+      <type>war</type>
+    </dependency -->
+    <dependency>
+      <groupId>chicksnp-proj</groupId>
+      <artifactId>ejbs</artifactId>
+      <type>ejb</type>
+    </dependency>
+    <dependency>
+      <groupId>javamisc</groupId>
+      <artifactId>javamisc</artifactId>
+    </dependency>
+    <!-- dependency>
+      <groupId>org.mindrot</groupId>
+      <artifactId>jbcrypt</artifactId>
+    </dependency -->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-ear-plugin</artifactId>
+	<version>2.4.1</version>
+	<!-- configuration>
+	  <modules>
+	    <webModule>
+	      <groupId>chicksnp-proj</groupId>
+	      <artifactId>${chicksnp.webmodule}</artifactId>
+	      <contextRoot>/chicksnp</contextRoot>
+	    </webModule>
+	  </modules>
+	</configuration -->
+      </plugin>
+      <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+        <version>${version.wildfly.maven.plugin}</version>
+        <!-- <inherited>true</inherited> -->
+        <!-- <configuration> -->
+        <!--   <skip>true</skip> -->
+        <!-- </configuration> -->
+      </plugin>
+    </plugins>
+    <finalName>chicksnp</finalName>
+  </build>
+
+</project>

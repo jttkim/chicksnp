@@ -1,0 +1,98 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <properties>
+    <projectroot>${basedir}/..</projectroot>
+  </properties>
+
+  <parent>
+    <groupId>chicksnp-proj</groupId>
+    <artifactId>chicksnp</artifactId>
+    <version>${chicksnpVersion}</version>
+  </parent>
+  <artifactId>ejbs</artifactId>
+  <packaging>ejb</packaging>
+  <name>chicksnp-ejbs</name>
+
+  <build>
+    <finalName>chicksnp-ejb</finalName>
+    <plugins>
+     <!-- should be inherited -->
+      <!-- plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+	  <verbose>false</verbose>
+	  <showDeprecation>true</showDeprecation>
+	  <showWarnings>true</showWarnings>
+        </configuration>
+      </plugin -->
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-ejb-plugin</artifactId>
+	<version>2.3</version>
+	<configuration>
+	  <archive>
+	    <manifestEntries>
+	      <!-- FIXME: hard-coded jar names - is there a Maven way to get at these by dependency?? -->
+	      <Class-Path>javamisc-1.0.jar</Class-Path>
+	    </manifestEntries>
+	  </archive>
+	  <ejbVersion>3.0</ejbVersion>
+	  <generateClient>true</generateClient>
+	</configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>chicksnp-proj</groupId>
+      <artifactId>util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ejb</groupId>
+      <artifactId>ejb</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mindrot</groupId>
+      <artifactId>jbcrypt</artifactId>
+    </dependency>
+
+    <!-- FIXME: is this really needed? EJBs shouldn't depend on JSP or other web tier stuff -->
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise.concurrent</groupId>
+      <artifactId>javax.enterprise.concurrent-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>oraclejdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javamisc</groupId>
+      <artifactId>javamisc</artifactId>
+    </dependency>
+  </dependencies>
+</project>

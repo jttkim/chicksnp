@@ -1,0 +1,48 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <properties>
+    <projectroot>${basedir}/..</projectroot>
+  </properties>
+
+  <parent>
+    <groupId>chicksnp-proj</groupId>
+    <artifactId>chicksnp</artifactId>
+    <version>${chicksnpVersion}</version>
+  </parent>
+
+  <artifactId>util</artifactId>
+  <packaging>jar</packaging>
+  <name>chicksnp-util</name>
+
+  <!-- Note: the util module must not depend on any other module, as all
+  other modules may depend on the util module -->
+
+  <build>
+    <finalName>chicksnp-util</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-jar-plugin</artifactId>
+	<!-- 3version>2.4</version -->
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javamisc</groupId>
+      <artifactId>javamisc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>oraclejdbc</artifactId>
+    </dependency>
+  </dependencies>
+
+</project>
+
