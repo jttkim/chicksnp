@@ -18,8 +18,11 @@ import uk.ac.pirbright.chicksnp.ejb.entity.*;
 
 public interface SnpSession
 {
+  ChickenLine findChickenLine(String chickenLineName);
   void importVcf(String chickenLineName, String filename) throws IOException;
-  ChickenSnp insertChickenSnp(ChickenSnp chickenSnp);
   void importChickenLines(String filename) throws IOException;
+  ChickenSnp insertChickenSnp(ChickenSnp chickenSnp);
+  void insertChickenSnpsFromLine(ChickenLine chickenLine);
+  ChickenLine insertChickenLine(ChickenLine chickenLine);
   List<ChickenLocus> findDifferentialSnpLocusList(Set<String> chickenLineNameSet1, Set<String> chickenLineNameSet2);
 }

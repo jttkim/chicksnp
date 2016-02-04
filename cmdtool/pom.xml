@@ -152,6 +152,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>9.4.1207</version>
+    </dependency>
+
+    <dependency>
       <groupId>javamisc</groupId>
       <artifactId>javamisc</artifactId>
       <type>jar</type>

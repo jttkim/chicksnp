@@ -349,6 +349,13 @@
       </dependency>
 
       <!-- other external libraries -->
+
+      <dependency>
+	<groupId>org.postgresql</groupId>
+	<artifactId>postgresql</artifactId>
+	<version>9.4.1207</version>
+      </dependency>
+
       <!-- dependency>
 	<groupId>org.apache.wicket</groupId>
 	<artifactId>wicket-core</artifactId>

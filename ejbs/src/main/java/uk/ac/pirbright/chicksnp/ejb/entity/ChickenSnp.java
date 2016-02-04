@@ -2,6 +2,9 @@ package uk.ac.pirbright.chicksnp.ejb.entity;
 
 import java.io.Serializable;
 
+import java.util.Set;
+import java.util.HashSet;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
@@ -136,6 +139,8 @@ public class ChickenSnp implements Serializable
   public void linkChickenLine(ChickenLine chickenLine)
   {
     this.chickenLine = chickenLine;
+    // System.err.println(String.format("chicken line: %s", chickenLine));
+    // System.err.println(String.format("snp set: %s", chickenLine.getChickenSnpSet()));
     chickenLine.getChickenSnpSet().add(this);
   }
 
@@ -201,5 +206,43 @@ public class ChickenSnp implements Serializable
   {
     String s = String.format("%s:%d, %s: %s -> %s", this.chickenChromosome.getName(), this.pos, this.chickenLine.getName(), this.ref, this.alt);
     return (s);
+  }
+
+
+  public static Set<ChickenSnp> vcfLineToChickenSnpSet(ChickenLine chickenLine, String vcfLine)
+  {
+    Set<ChickenSnp> chickenSnpSet = new HashSet<ChickenSnp>();
+    if ((vcfLine.length() == 0) || vcfLine.startsWith("#"))
+    {
+      return (chickenSnpSet);
+    }
+    String[] w = vcfLine.split("\t");
+    if (w.length < 8)
+    {
+      throw new IllegalArgumentException(String.format("malformed VCF line: %s", vcfLine));
+    }
+    String chrom = w[0];
+    int pos = Integer.parseInt(w[1].trim());
+    String id = w[2];
+    String ref = w[3];
+    String[] altList = w[4].split(",");
+    for (int i = 0; i < altList.length; i++)
+    {
+      altList[i] = altList[i].trim();
+    }
+    /*
+    if (altList.length > 1)
+    {
+      System.err.println(String.format("multi-nucleotide SNP: \"%s\"", w[4]));
+    }
+    */
+    String qual = w[5];
+    String filter = w[6];
+    String info = w[7];
+    for (String alt : altList)
+    {
+      chickenSnpSet.add(new ChickenSnp(chickenLine, new ChickenChromosome(chrom), pos, ref, alt));
+    }
+    return (chickenSnpSet);
   }
 }
