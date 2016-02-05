@@ -10,13 +10,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-
-import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.ejb.Remote;
@@ -62,7 +61,6 @@ class ChickenSnpQueryProvider implements QueryProvider<ChickenSnp>
 }
 
 
-// plan: develop into a chicken locus scanner
 class BufferedResultListIterator<GenericEntity> implements Iterator<GenericEntity>
 {
   private GenericEntity nextEntity;
@@ -124,6 +122,10 @@ class BufferedResultListIterator<GenericEntity> implements Iterator<GenericEntit
   {
     // System.err.println("next");
     GenericEntity entity = this.nextEntity;
+    if (entity == null)
+    {
+      throw new NoSuchElementException("no next entity");
+    }
     this.fetchNextEntity();
     return (entity);
   }
@@ -160,6 +162,55 @@ class BufferedResultList<GenericEntity> implements Iterable<GenericEntity>
   public Iterator<GenericEntity> iterator()
   {
     return (new BufferedResultListIterator(this.query, this.bufsize));
+  }
+}
+
+
+class ChickenLocusScanner
+{
+  private Iterator<ChickenSnp> chickenSnpIterator;
+  private ChickenSnp nextChickenSnp;
+
+
+  public ChickenLocusScanner(Iterator<ChickenSnp> chickenSnpIterator)
+  {
+    this.chickenSnpIterator = chickenSnpIterator;
+    this.fetchNext();
+  }
+
+
+  public ChickenLocusScanner(Iterable<ChickenSnp> chickenSnpIterable)
+  {
+    this(chickenSnpIterable.iterator());
+  }
+
+
+  private void fetchNext()
+  {
+    if (this.chickenSnpIterator.hasNext())
+    {
+      this.nextChickenSnp = this.chickenSnpIterator.next();
+    }
+    else
+    {
+      this.nextChickenSnp = null;
+    }
+  }
+
+  public ChickenLocus nextChickenLocus()
+  {
+    if (this.nextChickenSnp == null)
+    {
+      return (null);
+    }
+    ChickenLocus chickenLocus = new ChickenLocus(this.nextChickenSnp);
+    this.fetchNext();
+    while ((this.nextChickenSnp != null) && chickenLocus.atLocus(this.nextChickenSnp))
+    {
+      chickenLocus.addChickenSnp(this.nextChickenSnp);
+      this.fetchNext();
+    }
+    return (chickenLocus);
   }
 }
 
@@ -382,6 +433,7 @@ public class SnpSessionBean implements SnpSession
   }
 
 
+  /*
   private void rattleThroughBufferedResultList(Query query)
   {
     BufferedResultList<ChickenSnp> bufferedQuery = new BufferedResultList(query, 7);
@@ -417,37 +469,28 @@ public class SnpSessionBean implements SnpSession
       chickenSnpList = query.getResultList();
     }
   }
+  */
 
 
   public List<ChickenLocus> findDifferentialSnpLocusList(Set<String> chickenLineNameSet1, Set<String> chickenLineNameSet2)
   {
-    Logger logger = Logger.getGlobal();
-    logger.info("starting");
     Set<ChickenLine> chickenLineSet1 = this.findChickenLineSet(chickenLineNameSet1);
     Set<ChickenLine> chickenLineSet2 = this.findChickenLineSet(chickenLineNameSet2);
     Set<ChickenLine> allChickenLineSet = new HashSet<ChickenLine>(chickenLineSet1);
     allChickenLineSet.addAll(chickenLineSet2);
     Set<String> allChickenLineNameSet = new HashSet<String>(chickenLineNameSet1);
     allChickenLineNameSet.addAll(chickenLineNameSet2);
-    System.err.println(String.format("findDifferentialSnpList: total number of line names is %d", allChickenLineNameSet.size()));
+    // System.err.println(String.format("findDifferentialSnpList: total number of line names is %d", allChickenLineNameSet.size()));
     Query query = this.entityManager.createQuery("SELECT s FROM ChickenSnp s WHERE s.chickenLine.name IN ( :nameSet ) ORDER BY s.chickenChromosome.name, s.pos");
     query.setParameter("nameSet", allChickenLineNameSet);
     // query.setParameter("nameSet", allChickenLineNameSet.iterator().next());
     // List<ChickenSnp> chickenSnpList = genericTypecast(query.getResultList());
     // System.err.println(String.format("findDifferentialSnpList: got %d SNPs", chickenSnpList.size()));
-    BufferedResultList<ChickenSnp> chickenList = new BufferedResultList<ChickenSnp>(query);
+    BufferedResultList<ChickenSnp> chickenSnpList = new BufferedResultList<ChickenSnp>(query);
+    ChickenLocusScanner chickenLocusScanner = new ChickenLocusScanner(chickenSnpList);
     List<ChickenLocus> chickenLocusList = new ArrayList<ChickenLocus>();
-    ChickenSnp firstSnpAtLocus = null;
-    for (ChickenSnp chickenSnp : chickenSnpList)
+    for (ChickenLocus chickenLocus = chickenLocusScanner.nextChickenLocus(); chickenLocus != null; chickenLocus = chickenLocusScanner.nextChickenLocus())
     {
-
-      ChickenLocus chickenLocus = new ChickenLocus(chickenSnpList.get(i));
-      int j = i + 1;
-      while ((j < chickenSnpList.size()) && chickenLocus.atLocus(chickenSnpList.get(j)))
-      {
-        chickenLocus.addChickenSnp(chickenSnpList.get(j++));
-      }
-      i = j;
       chickenLocus.addNonSnpLines(allChickenLineSet);
       Set<String> nucleotideSet1 = this.findNucleotideSet(chickenLocus, chickenLineSet1);
       Set<String> nucleotideSet2 = this.findNucleotideSet(chickenLocus, chickenLineSet2);
@@ -455,11 +498,15 @@ public class SnpSessionBean implements SnpSession
       if (nucleotideSet1.size() == 0)
       {
         chickenLocusList.add(chickenLocus);
+        // System.err.println(String.format("found locus #%d at %s:%d", chickenLocusList.size(), chickenLocus.getChickenChromosome().getName(), chickenLocus.getPos()));
       }
-      logger.info(String.format("done %d / %d", i, chickenSnpList.size()));
-      System.err.println(String.format("done %d / %d", i, chickenSnpList.size()));
+      /*
+      else
+      {
+        System.err.println(String.format("found non-supporting locus: %s:%d", chickenLocus.getChickenChromosome().getName(), chickenLocus.getPos()));
+      }
+      */
     }
-    logger.info("finishing");
     return (chickenLocusList);
   }
 }

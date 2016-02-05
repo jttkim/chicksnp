@@ -19,4 +19,10 @@ redeploy :
 undeploy :
 	$(JBOSS_HOME)/bin/jboss-cli.sh --connect --command="undeploy chicksnp.ear"
 
-.PHONY : default package clean deploy undeploy
+dbdump :
+	pg_dump -b -c -O chicksnp_test > chicksnp_dump.sql
+
+dbrestore :
+	psql chicksnp_test < chicksnp_dump.sql
+
+.PHONY : default package clean deploy undeploy dbdump dbrestore
