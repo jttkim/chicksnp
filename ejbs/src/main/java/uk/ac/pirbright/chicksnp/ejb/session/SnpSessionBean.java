@@ -315,7 +315,6 @@ public class SnpSessionBean implements SnpSession
         this.entityManager.persist(chickenSnp);
       }
       this.entityManager.flush();
-      this.entityManager.clear();
       // System.err.println("flushed");
     }
   }

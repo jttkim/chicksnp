@@ -12,11 +12,15 @@ do_run ()
 }
 
 
-. ./dbconfig.sh
-echo $dbname
+if test -f ./dbconfig.sh ; then
+  . ./dbconfig.sh
+  # echo $dbname
+fi
 
-do_run java -jar cmdtool/target/chicksnp-cmdtool.jar chickimport ${PWD}/toysnp/mocklines.txt 
+
+do_run java -jar cmdtool/target/chicksnp-cmdtool.jar chickimport toysnp/mocklines.txt 
 for i in 1 2 3 4 ; do
-  do_run java -jar cmdtool/target/chicksnp-cmdtool.jar vcfjdbcimport m${i} ${PWD}/toysnp/m${i}.vcf $dbname $dbuser $dbpassword
+  do_run java -jar cmdtool/target/chicksnp-cmdtool.jar vcfimport m${i} toysnp/m${i}.vcf
+  # do_run java -jar cmdtool/target/chicksnp-cmdtool.jar vcfjdbcimport m${i} toysnp/m${i}.vcf $dbname $dbuser $dbpassword
 done
 

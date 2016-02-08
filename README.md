@@ -5,10 +5,15 @@ _C-DAC / Pirbright Institute joint development_
 
 ## Prerequisites
 
-Build: Java 8 (7 might work too), maven, make
+Build:
 
-Runtime: wildfly (other JEE containers should also work), datasource
-called `ChicksnpPostgresDS`.
+* Java 8 (7 might work too)
+* maven
+* make (optional)
+* javamisc from https://github.com/jttkim/javamisc
+
+Runtime: wildfly (other JEE containers should also work), installed
+with datasource called `ChicksnpPostgresDS`.
 
 Also PostgreSQL for speed-optimised loading of data from VCF files
 into the database.
@@ -37,9 +42,22 @@ where `cmd` is one of
   above
 
 
+## Instructions
+
+Build by running `mvn package` or simply `make`
+
+Deploy by running
+```
+/your/path/to/jboss/bin/jboss-cli.sh --connect --command="deploy ear/target/chicksnp.ear --force"
+```
+
+Then try populating the system with mock data by running `./mock.sh`
+
+
 ## ToDo
 
 * [ ] discuss and compare with C-DAC prototype
 * [ ] add web module
 * [ ] optimise `SnpSessionBean.findDifferentialSnpLocusList` method
+* [ ] fix `pom.xml` so that `mvn wildfly:deploy` will work
 * [ ] ...
