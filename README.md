@@ -26,17 +26,7 @@ JEE app comprised of modules
 * `ejb`: entities and one session bean `SnpSessionBean` that contains
 business methods for populating and querying
 
-* `cmdtool`: command line interface, usage:
-```
-java -jar cmdtool/target/chicksnp-cmdtool.jar <cmd> <args>
-```
-where `cmd` is one of
-  * `vcfimport <chickenLine> <vcfFile>` import from VCF file
-  * `vcfjdbcimport <chickenLine> <vcfFile> <dbname> <dbuser> <dbpassword>` import from VCF file using JDBC and bypassing business tier, much faster
-  * `chickimport <file>` import chicken line names
-  * `testsplit <split>` get SNP loci supporting split, specified as
-    two comma-separated lists separated by `|`, e.g. `Line6|Line7` or
-    `m1,m2|m3,m4`
+* `cmdtool`: command line interface, see Instructions below for usage.
 
 * `util`: utility classes and methods that don't depend on the modules
   above
@@ -52,6 +42,20 @@ Deploy by running
 ```
 
 Then try populating the system with mock data by running `./mock.sh`
+
+
+### Command Line Interface
+
+```
+java -jar cmdtool/target/chicksnp-cmdtool.jar <cmd> <args>
+```
+where `cmd` is one of
+* `vcfimport <chickenLine> <vcfFile>` import from VCF file
+* `vcfjdbcimport <chickenLine> <vcfFile> <dbname> <dbuser> <dbpassword>` import from VCF file using JDBC and bypassing business tier, much faster
+* `chickimport <file>` import chicken line names
+* `testsplit <split>` get SNP loci supporting split, specified as
+  two comma-separated lists separated by `|`, e.g. `Line6|Line7` or
+  `m1,m2|m3,m4`
 
 
 ## ToDo
