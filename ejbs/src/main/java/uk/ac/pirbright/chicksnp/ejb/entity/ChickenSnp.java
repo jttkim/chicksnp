@@ -123,6 +123,7 @@ public class ChickenSnp implements Serializable
   }
 
 
+  // unidirectional
   @ManyToOne(optional = false)
   public ChickenLine getChickenLine()
   {
@@ -141,7 +142,7 @@ public class ChickenSnp implements Serializable
     this.chickenLine = chickenLine;
     // System.err.println(String.format("chicken line: %s", chickenLine));
     // System.err.println(String.format("snp set: %s", chickenLine.getChickenSnpSet()));
-    chickenLine.getChickenSnpSet().add(this);
+    // chickenLine.getChickenSnpSet().add(this);
   }
 
 
@@ -151,10 +152,12 @@ public class ChickenSnp implements Serializable
     {
       return (false);
     }
+    /*
     if (!this.chickenLine.getChickenSnpSet().remove(this))
     {
       return (false);
     }
+    */
     this.chickenLine = null;
     return (true);
   }

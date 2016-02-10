@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 import java.util.NoSuchElementException;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -28,6 +29,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import static org.javamisc.Util.genericTypecast;
+
+import uk.ac.pirbright.chicksnp.util.GenomicRange;
 
 import uk.ac.pirbright.chicksnp.ejb.entity.*;
 
@@ -85,7 +88,7 @@ class BufferedResultListIterator<GenericEntity> implements Iterator<GenericEntit
     query.setFirstResult(this.offset);
     List<GenericEntity> entityList = genericTypecast(this.query.getResultList());
     this.offset += entityList.size();
-    // System.err.println(String.format("  new offset %d", this.offset));
+    System.err.println(String.format("fetched %d entities, new offset %d", entityList.size(), this.offset));
     this.resultListIterator = entityList.iterator();
   }
 
@@ -345,18 +348,16 @@ public class SnpSessionBean implements SnpSession
   }
 
 
-  public void insertChickenSnpsFromLine(ChickenLine chickenLine)
+  public void insertChickenSnps(String chickenLineName, Collection<ChickenSnp> chickenSnpCollection)
   {
-    ChickenLine persistedChickenLine = this.findChickenLine(chickenLine.getName());
-    if (persistedChickenLine == null)
+    ChickenLine chickenLine = this.findChickenLine(chickenLineName);
+    if (chickenLine == null)
     {
-      throw new RuntimeException(String.format("no chicken line with name \"%s\"", chickenLine.getName()));
+      throw new RuntimeException(String.format("no chicken line with name \"%s\"", chickenLineName));
     }
-    // System.err.println(String.format("insertChickenSnpsFromLine: inserting %d SNPs", chickenLine.getChickenSnpSet().size()));
-    for (ChickenSnp chickenSnp : new HashSet<ChickenSnp>(chickenLine.getChickenSnpSet()))
+    for (ChickenSnp chickenSnp : chickenSnpCollection)
     {
-      chickenSnp.unlinkChickenLine();
-      chickenSnp.linkChickenLine(persistedChickenLine);
+      chickenSnp.linkChickenLine(chickenLine);
       ChickenChromosome chickenChromosome = chickenSnp.getChickenChromosome();
       if (chickenChromosome != null)
       {
@@ -471,7 +472,7 @@ public class SnpSessionBean implements SnpSession
   */
 
 
-  public List<ChickenLocus> findDifferentialSnpLocusList(Set<String> chickenLineNameSet1, Set<String> chickenLineNameSet2)
+  public List<ChickenLocus> findDifferentialSnpLocusList(Set<String> chickenLineNameSet1, Set<String> chickenLineNameSet2, GenomicRange genomicRange)
   {
     Set<ChickenLine> chickenLineSet1 = this.findChickenLineSet(chickenLineNameSet1);
     Set<ChickenLine> chickenLineSet2 = this.findChickenLineSet(chickenLineNameSet2);
@@ -480,7 +481,18 @@ public class SnpSessionBean implements SnpSession
     Set<String> allChickenLineNameSet = new HashSet<String>(chickenLineNameSet1);
     allChickenLineNameSet.addAll(chickenLineNameSet2);
     // System.err.println(String.format("findDifferentialSnpList: total number of line names is %d", allChickenLineNameSet.size()));
-    Query query = this.entityManager.createQuery("SELECT s FROM ChickenSnp s WHERE s.chickenLine.name IN ( :nameSet ) ORDER BY s.chickenChromosome.name, s.pos");
+    Query query = null;
+    if (genomicRange == null)
+    {
+      query = this.entityManager.createQuery("SELECT s FROM ChickenSnp s WHERE s.chickenLine.name IN ( :nameSet ) ORDER BY s.chickenChromosome.name, s.pos");
+    }
+    else
+    {
+      query = this.entityManager.createQuery("SELECT chickenSnp FROM ChickenSnp chickenSnp WHERE chickenSnp.chickenLine.name IN ( :nameSet ) AND chickenSnp.chickenChromosome.name = :chrom and chickenSnp.pos >= :rangeStart AND chickenSnp.pos <= :rangeEnd ORDER BY chickenSnp.chickenChromosome.name, chickenSnp.pos");
+      query.setParameter("chrom", genomicRange.getChrom());
+      query.setParameter("rangeStart", genomicRange.getStart());
+      query.setParameter("rangeEnd", genomicRange.getEnd());
+    }
     query.setParameter("nameSet", allChickenLineNameSet);
     // query.setParameter("nameSet", allChickenLineNameSet.iterator().next());
     // List<ChickenSnp> chickenSnpList = genericTypecast(query.getResultList());
@@ -490,22 +502,31 @@ public class SnpSessionBean implements SnpSession
     List<ChickenLocus> chickenLocusList = new ArrayList<ChickenLocus>();
     for (ChickenLocus chickenLocus = chickenLocusScanner.nextChickenLocus(); chickenLocus != null; chickenLocus = chickenLocusScanner.nextChickenLocus())
     {
+      // System.err.println(String.format("got locus %s:%d", chickenLocus.getChickenChromosome().getName(), chickenLocus.getPos()));
       chickenLocus.addNonSnpLines(allChickenLineSet);
+      // System.err.println("added non-SNP lines");
       Set<String> nucleotideSet1 = this.findNucleotideSet(chickenLocus, chickenLineSet1);
       Set<String> nucleotideSet2 = this.findNucleotideSet(chickenLocus, chickenLineSet2);
+      // System.err.println("got nucleotide sets");
       nucleotideSet1.retainAll(nucleotideSet2);
       if (nucleotideSet1.size() == 0)
       {
         chickenLocusList.add(chickenLocus);
         // System.err.println(String.format("found locus #%d at %s:%d", chickenLocusList.size(), chickenLocus.getChickenChromosome().getName(), chickenLocus.getPos()));
       }
-      /*
+
       else
       {
-        System.err.println(String.format("found non-supporting locus: %s:%d", chickenLocus.getChickenChromosome().getName(), chickenLocus.getPos()));
+        // System.err.println(String.format("found non-supporting locus: %s:%d", chickenLocus.getChickenChromosome().getName(), chickenLocus.getPos()));
       }
-      */
+
     }
     return (chickenLocusList);
+  }
+
+
+  public List<ChickenLocus> findDifferentialSnpLocusList(Set<String> chickenLineNameSet1, Set<String> chickenLineNameSet2)
+  {
+    return (this.findDifferentialSnpLocusList(chickenLineNameSet1, chickenLineNameSet2, null));
   }
 }

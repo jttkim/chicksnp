@@ -219,8 +219,14 @@ public class Main
   }
 
 
-  private static void testSplit(String splitArg) throws Exception
+  private static void testSplit(String splitArg, String rangeArg) throws Exception
   {
+    GenomicRange genomicRange = null;
+    if (rangeArg != null)
+    {
+      genomicRange = new GenomicRange(rangeArg);
+      System.err.println(String.format("genomic range: %s", genomicRange.toString()));
+    }
     String[] w = splitArg.split("\\|");
     if (w.length != 2)
     {
@@ -228,10 +234,10 @@ public class Main
     }
     Set<String> chickenLineNameSet1 = csvToSet(w[0]);
     Set<String> chickenLineNameSet2 = csvToSet(w[1]);
-    List<ChickenLocus> chickenLocusList = snpSession.findDifferentialSnpLocusList(chickenLineNameSet1, chickenLineNameSet2);
+    List<ChickenLocus> chickenLocusList = snpSession.findDifferentialSnpLocusList(chickenLineNameSet1, chickenLineNameSet2, genomicRange);
     for (ChickenLocus chickenLocus : chickenLocusList)
     {
-      System.err.println(chickenLocus);
+      System.out.println(chickenLocus);
     }
   }
 
@@ -266,7 +272,14 @@ public class Main
     }
     else if ("testsplit".equals(cmd))
     {
-      testSplit(args[1]);
+      if (args.length > 2)
+      {
+        testSplit(args[1], args[2]);
+      }
+      else
+      {
+        testSplit(args[1], null);
+      }
     }
     else
     {

@@ -106,6 +106,7 @@ public class ChickenLocus implements Serializable
   {
     // FIXME: could check that added snp is indeed at same locus
     String chickenLineName = chickenSnp.getChickenLine().getName();
+    // System.err.println(String.format("ChickenLocus.addChickenSnp: adding SNP from line %s", chickenSnp.getChickenLine().getName()));
     if (!this.chickenSnpMap.containsKey(chickenLineName))
     {
       this.chickenSnpMap.put(chickenLineName, new HashSet<ChickenSnp>());
@@ -116,16 +117,26 @@ public class ChickenLocus implements Serializable
 
   public void addNonSnpLines(Set<ChickenLine> chickenLineSet)
   {
+    // System.err.println("ChickenLocus.addNonSnpLines: start");
     for (ChickenLine chickenLine : chickenLineSet)
     {
+      // System.err.println(String.format("ChickenLocus.addNonSnpLines: checking line %s", chickenLine.getName()));
       Set<ChickenSnp> chickenLineSnpSet = this.chickenSnpMap.get(chickenLine.getName());
       if (chickenLineSnpSet == null)
       {
+        // System.err.println("ChickenLocus.addNonSnpLines: got null SNP set");
         chickenLineSnpSet = new HashSet<ChickenSnp>();
-        chickenLineSnpSet.add(new ChickenSnp(chickenLine, this.chickenChromosome, this.pos, this.ref, this.ref));
+        ChickenSnp chickenSnp = new ChickenSnp(chickenLine, this.chickenChromosome, this.pos, this.ref, this.ref);
+        chickenLineSnpSet.add(chickenSnp);
         this.chickenSnpMap.put(chickenLine.getName(), chickenLineSnpSet);
+        // System.err.println(String.format("ChickenLocus.addNonSnpLines: added SNP %s", chickenSnp.toString()));
+      }
+      else
+      {
+        // System.err.println(String.format("ChickenLocus.addNonSnpLines: got set of %d SNPs", chickenLineSnpSet.size()));
       }
     }
+    // System.err.println("ChickenLocus.addNonSnpLines: done");
   }
 
 

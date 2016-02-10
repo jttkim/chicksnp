@@ -23,12 +23,11 @@ public class ChickenLine implements Serializable
 
   private Integer id;
   private String name;
-  private Set<ChickenSnp> chickenSnpSet;
 
 
   public ChickenLine()
   {
-    this.chickenSnpSet = new HashSet<ChickenSnp>();
+    super();
   }
 
 
@@ -61,6 +60,7 @@ public class ChickenLine implements Serializable
   {
     if (this.id == null)
     {
+      System.err.println("hashCode called for ChickenLine instance(s) with null ID");
       return (0);
     }
     else
@@ -97,6 +97,8 @@ public class ChickenLine implements Serializable
   }
 
 
+  // no association to ChickenSnp -- unidirectional
+  /*
   @OneToMany(mappedBy = "chickenLine")
   public Set<ChickenSnp> getChickenSnpSet()
   {
@@ -126,4 +128,5 @@ public class ChickenLine implements Serializable
     chickenSnp.setChickenLine(null);
     return (true);
   }
+  */
 }

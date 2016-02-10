@@ -37,7 +37,7 @@
 	  <archive>
 	    <manifestEntries>
 	      <!-- FIXME: hard-coded jar names - is there a Maven way to get at these by dependency?? -->
-	      <Class-Path>javamisc-1.0.jar</Class-Path>
+	      <Class-Path>chicksnp-util.jar javamisc-1.0.jar</Class-Path>
 	    </manifestEntries>
 	  </archive>
 	  <ejbVersion>3.0</ejbVersion>
