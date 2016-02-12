@@ -163,6 +163,7 @@ public class ChickenSnp implements Serializable
   }
 
 
+  // unidirectional
   @ManyToOne(optional = false)
   public ChickenChromosome getChickenChromosome()
   {
@@ -179,7 +180,7 @@ public class ChickenSnp implements Serializable
   public void linkChickenChromosome(ChickenChromosome chickenChromosome)
   {
     this.chickenChromosome = chickenChromosome;
-    chickenChromosome.getChickenSnpSet().add(this);
+    // chickenChromosome.getChickenSnpSet().add(this);
   }
 
 
@@ -189,10 +190,12 @@ public class ChickenSnp implements Serializable
     {
       return (false);
     }
+    /*
     if (!this.chickenChromosome.getChickenSnpSet().remove(this))
     {
       return (false);
     }
+    */
     this.chickenChromosome = null;
     return (true);
   }

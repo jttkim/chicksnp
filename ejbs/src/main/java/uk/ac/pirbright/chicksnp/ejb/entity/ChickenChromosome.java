@@ -23,12 +23,13 @@ public class ChickenChromosome implements Serializable
 
   private Integer id;
   private String name;
-  private Set<ChickenSnp> chickenSnpSet;
+  // private Set<ChickenSnp> chickenSnpSet;
 
 
   public ChickenChromosome()
   {
-    this.chickenSnpSet = new HashSet<ChickenSnp>();
+    super();
+    // this.chickenSnpSet = new HashSet<ChickenSnp>();
   }
 
 
@@ -97,6 +98,7 @@ public class ChickenChromosome implements Serializable
   }
 
 
+  /*
   @OneToMany(mappedBy = "chickenChromosome")
   public Set<ChickenSnp> getChickenSnpSet()
   {
@@ -126,4 +128,5 @@ public class ChickenChromosome implements Serializable
     chickenSnp.setChickenChromosome(null);
     return (true);
   }
+  */
 }
