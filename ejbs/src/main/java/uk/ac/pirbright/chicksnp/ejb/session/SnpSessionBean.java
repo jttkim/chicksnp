@@ -484,7 +484,7 @@ public class SnpSessionBean implements SnpSession
     Query query = null;
     if (genomicRange == null)
     {
-      query = this.entityManager.createQuery("SELECT s FROM ChickenSnp s WHERE s.chickenLine.name IN ( :nameSet ) ORDER BY s.chickenChromosome.name, s.pos");
+      query = this.entityManager.createQuery("SELECT chickenSnp FROM ChickenSnp chickenSnp WHERE chickenSnp.chickenLine.name IN ( :nameSet ) ORDER BY chickenSnp.chickenChromosome.name, chickenSnp.pos");
     }
     else
     {
